@@ -8,6 +8,12 @@ const CategorySchema = new mongoose.Schema(
             trim: true, // loại bỏ khoảng trắng thừa ở đầu và cuối chuỗi
             unique: true, // tên category không được trùng nhau
         },
+        slug: {
+            type: String,
+            unique: true, // slug không được trùng nhau
+            lowercase: true, // chuyển về chữ thường
+            index: true, // tạo index để tìm kiếm nhanh hơn
+        },
         description: {
             type: String,
             trim: true,

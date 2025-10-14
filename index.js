@@ -7,6 +7,8 @@ import { databaseConnection } from './src/config/database.js'
 import authRouter from './src/routes/auth-routes.routes.js'
 import profileRouter from './src/routes/profile.routes.js';
 import productRouter from './src/routes/product.routes.js';
+import categoryRouter from './src/routes/categories.routes.js';
+import { setupSwagger } from './src/config/swagger.js';
 const app = express()
 
 dotenv.config();
@@ -22,9 +24,14 @@ app.use(cors({
     credentials: true // Cho phép gửi cookie
 }))
 
+
+// Thiết lập Swagger
+setupSwagger(app);
+
 app.use('/api/auth', authRouter) // Mục đính phục cho riêng authentication
 app.use('/api/profile', profileRouter) // Mục đính phục cho riêng profile
-app.use('/api/products', productRouter)
+app.use('/api/products', productRouter) // Mục đính phục cho riêng product
+app.use('/api/categories', categoryRouter) // Mục đính phục cho riêng category
 
 app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000')
