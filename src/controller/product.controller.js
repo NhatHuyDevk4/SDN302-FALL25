@@ -1,3 +1,4 @@
+import Category from "../models/category.model.js";
 import Product from "../models/product.model.js";
 
 // GET [/api/products]
@@ -18,13 +19,21 @@ export const createProduct = async (req, res) => {
         if (!name || !description || !images || !brand || !category || !price || !stock) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
+
+        const findCategory = await Category.find({ name: { $in: category } }); //$in là tìm trong mảng
+        if (findCategory.length === 0) {
+            return res.status(400).json({ message: 'Category not found' });
+        }
+
+        const categoryIds = findCategory.map(cat => cat._id); // Lấy mảng id của các category tìm được
+
         // Thêm sản phẩm vào database
         const newProduct = new Product({
             name,
             description,
             images,
             brand,
-            category,
+            category: categoryIds,
             price,
             discount,
             stock,
@@ -74,21 +83,50 @@ export const deleteProductById = async (req, res) => {
 // PUT [/api/products/:id]
 export const updateProductById = async (req, res) => {
     const { id } = req.params;
-    console.log('Update Product ID:', id);
     try {
         const { name, description, images, brand, category, price, discount, stock, tags, ratings } = req.body;
-        const updateProductById = await Product.findByIdAndUpdate(id, {
-            name, description, images, brand, category, price, discount, stock, tags, ratings, updatedBy: req.user.userId
-        },
-            {
-                new: true
+
+        const updateFields = {
+            updateBy: req.user.userId // req.user được gán trong middleware verifyToken
+        };
+
+        if (name !== undefined) updateFields.name = name;
+        if (description !== undefined) updateFields.description = description;
+        if (images !== undefined) updateFields.images = images;
+        if (brand !== undefined) updateFields.brand = brand;
+        if (price !== undefined) updateFields.price = price;
+        if (discount !== undefined) updateFields.discount = discount;
+        if (stock !== undefined) updateFields.stock = stock;
+        if (tags !== undefined) updateFields.tags = tags;
+        if (ratings !== undefined) updateFields.ratings = ratings;
+
+        // Xử lý category (Thay thế hoàn toàn)
+        if (category && Array.isArray(category)) {
+            // Tìm danh mục trong database
+            const findCategory = await Category.find({ name: { $in: category } }); //$in là tìm trong mảng
+
+            if (findCategory.length === 0) {
+                return res.status(400).json({ message: 'Category not found' });
             }
-        )
-        // new: true để trả về document đã được cập nhật
-        if (!updateProductById) {
+
+            const categoryIds = findCategory.map(cat => cat._id); // Lấy mảng id của các category tìm được
+
+            // Thay thế hoàn toàn danh sách category
+            updateFields.category = categoryIds;
+        }
+
+        const updatedProduct = await Product.findByIdAndUpdate(
+            id,
+            { $set: updateFields },
+            { new: true } // Trả về document sau khi update
+        ).populate('category', '_id name'); // populate để thay thế ObjectId trong category bằng document thực tế từ collection categories
+
+        if (!updatedProduct) {
             return res.status(404).json({ message: 'Product not found' });
         }
-        return res.status(200).json({ message: 'Product updated successfully', success: true, product: updateProductById });
+
+        return res.status(200).json({ message: 'Product updated successfully', data: updatedProduct });
+
     } catch (error) {
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
