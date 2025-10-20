@@ -4,7 +4,7 @@ import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi, { serve } from "swagger-ui-express";
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-
+import fs from "fs";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -52,6 +52,14 @@ const options = {
 }
 
 const swaggerSpec = swaggerJSDoc(options); // Tạo tài liệu OpenAPI từ các chú thích trong code
+
+const outputDir = path.join(__dirname, '../public');
+if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+}
+
+const outputPath = path.join(outputDir, 'swagger.json');
+fs.writeFileSync(outputPath, JSON.stringify(swaggerSpec, null, 2));
 
 // Debug: log the generated spec to check if it's working
 console.log('Swagger spec generated:', Object.keys(swaggerSpec));
