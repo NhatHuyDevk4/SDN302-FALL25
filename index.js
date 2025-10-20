@@ -38,7 +38,7 @@ try {
 
 // Root route for testing
 app.get('/', (req, res) => {
-    res.json({ 
+    res.json({
         message: 'SDN302 API is running!',
         swagger: '/api-docs',
         endpoints: {

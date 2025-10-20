@@ -44,9 +44,9 @@ const options = {
         path.join(__dirname, '../routes/*.js'),
         path.join(__dirname, '../models/*.js'),
         // Fallback paths for different deployment environments
-        "./src/routes/*.js", 
+        "./src/routes/*.js",
         "./src/models/*.js",
-        "src/routes/*.js", 
+        "src/routes/*.js",
         "src/models/*.js"
     ], // Đường dẫn tới các file route và model để swagger-jsdoc quét các chú thích
 }
@@ -65,9 +65,9 @@ export const setupSwagger = (app) => {
             validatorUrl: null
         }
     };
-    
+
     app.use('/api-docs', serve, swaggerUi.setup(swaggerSpec, swaggerOptions)); // Thiết lập route /api-docs để phục vụ giao diện Swagger UI
-    
+
     // Also provide JSON endpoint for the swagger spec
     app.get('/swagger.json', (req, res) => {
         res.json(swaggerSpec);
