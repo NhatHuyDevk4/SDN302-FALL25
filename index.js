@@ -10,6 +10,7 @@ import productRouter from './src/routes/product.routes.js';
 import categoryRouter from './src/routes/categories.routes.js';
 import cartRouter from './src/routes/cart.routes.js';
 import { setupSwagger } from './src/config/swagger.js';
+import { setupStaticSwagger } from './src/config/swagger-static.js';
 const app = express()
 
 dotenv.config();
@@ -27,7 +28,28 @@ app.use(cors({
 
 
 // Thiết lập Swagger
-setupSwagger(app);
+try {
+    setupSwagger(app);
+    console.log('Dynamic Swagger setup successful');
+} catch (error) {
+    console.error('Dynamic Swagger failed, using static version:', error.message);
+    setupStaticSwagger(app);
+}
+
+// Root route for testing
+app.get('/', (req, res) => {
+    res.json({
+        message: 'SDN302 API is running!',
+        swagger: '/api-docs',
+        endpoints: {
+            auth: '/api/auth',
+            profile: '/api/profile',
+            products: '/api/products',
+            categories: '/api/categories',
+            cart: '/api/cart'
+        }
+    });
+});
 
 app.use('/api/auth', authRouter) // Mục đính phục cho riêng authentication
 app.use('/api/profile', profileRouter) // Mục đính phục cho riêng profile
@@ -35,12 +57,14 @@ app.use('/api/products', productRouter) // Mục đính phục cho riêng produc
 app.use('/api/categories', categoryRouter) // Mục đính phục cho riêng category
 app.use('/api/cart', cartRouter) // Mục đính phục cho riêng cart
 
-app.listen(3000, () => {
-    console.log('Server is running on http://localhost:3000')
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`)
 })
 
 
-// mongodb+srv://lenhathuy9a6_db_user:nhathuy123@cluster0.uurb90m.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+// MongoDB connection string should be in .env file for security
 // ctrl + / : comment code
 // MongoDB: NoSQL database
 // mongoose: thư viện giúp kết nối và thao tác với MongoDB dễ dàng hơn
