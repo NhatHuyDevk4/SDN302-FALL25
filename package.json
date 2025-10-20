@@ -20,6 +20,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "build": "echo 'Build step not needed for Node.js'"
+    "build": "echo 'Build step not needed for Node.js'",
+    "swagger:build": "node src/config/swagger.js"
   }
 }

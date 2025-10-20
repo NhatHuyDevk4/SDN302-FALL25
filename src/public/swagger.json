@@ -1,0 +1,1625 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Product API",
+    "version": "1.0.0",
+    "description": "API documentation for Product management"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local server"
+    },
+    {
+      "url": "https://sdn-302-fall-25.vercel.app",
+      "description": "Production server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "required": [
+          "username",
+          "email",
+          "password"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Auto-generated ID của người dùng"
+          },
+          "username": {
+            "type": "string",
+            "description": "Tên người dùng"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email của người dùng"
+          },
+          "password": {
+            "type": "string",
+            "description": "Mật khẩu của người dùng"
+          },
+          "role": {
+            "type": "string",
+            "description": "Vai trò của người dùng (user, admin)",
+            "default": "user"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Thời gian tạo tài khoản"
+          }
+        },
+        "example": {
+          "id": "60d0fe4f5311236168a109ca",
+          "username": "user123",
+          "email": "user@example.com",
+          "password": "Password123",
+          "role": "user",
+          "createdAt": "2023-01-01T00:00:00.000Z"
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "username": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              }
+            }
+          },
+          "accessToken": {
+            "type": "string",
+            "description": "JWT access token"
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "JWT refresh token"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Thông báo lỗi"
+          },
+          "statusCode": {
+            "type": "integer",
+            "description": "Mã lỗi HTTP"
+          }
+        }
+      },
+      "CartItem": {
+        "type": "object",
+        "properties": {
+          "product": {
+            "type": "string",
+            "description": "ID của sản phẩm."
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Số lượng sản phẩm.",
+            "default": 1
+          },
+          "price": {
+            "type": "number",
+            "description": "Giá của sản phẩm tại thời điểm thêm vào giỏ hàng."
+          }
+        },
+        "example": {
+          "product": "60d0fe4f5311236168a109ca",
+          "quantity": 2,
+          "price": 29.99
+        }
+      },
+      "Cart": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID tự động tạo của giỏ hàng."
+          },
+          "user": {
+            "type": "string",
+            "description": "ID của người dùng sở hữu giỏ hàng."
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CartItem"
+            }
+          },
+          "totalPrice": {
+            "type": "number",
+            "description": "Tổng giá trị của giỏ hàng.",
+            "default": 0
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Thời gian tạo giỏ hàng."
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Thời gian cập nhật giỏ hàng lần cuối."
+          }
+        },
+        "example": {
+          "id": "6151ae02a4b2a7645c81f1b3",
+          "user": "60d0fe4f5311236168a109cb",
+          "items": [
+            {
+              "product": "60d0fe4f5311236168a109ca",
+              "quantity": 2,
+              "price": 29.99
+            },
+            {
+              "product": "60d0fe4f5311236168a109d5",
+              "quantity": 1,
+              "price": 99.99
+            }
+          ],
+          "totalPrice": 159.97
+        }
+      },
+      "Category": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "The auto-generated id of the category"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the category"
+          },
+          "slug": {
+            "type": "string",
+            "description": "The slug of the category"
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the category"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Whether the category is active"
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "ID of user who created the category"
+          },
+          "updatedBy": {
+            "type": "string",
+            "description": "ID of user who last updated the category"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the category was created"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the category was last updated"
+          }
+        },
+        "example": {
+          "_id": "64f8a1234567890abcdef123",
+          "name": "Electronics",
+          "slug": "electronics",
+          "description": "Electronic devices and accessories",
+          "isActive": true,
+          "createdBy": "64f8a1234567890abcdef456",
+          "updatedBy": "64f8a1234567890abcdef456",
+          "createdAt": "2024-10-13T10:30:00.000Z",
+          "updatedAt": "2024-10-13T10:30:00.000Z"
+        }
+      },
+      "Product": {
+        "type": "object",
+        "required": [
+          "name",
+          "price"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The auto-generated id of the product"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the product"
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the product"
+          },
+          "price": {
+            "type": "number",
+            "description": "The price of the product"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "The URL of the product image"
+          }
+        },
+        "example": {
+          "id": "60d0fe4f5311236168a109ca",
+          "name": "Awesome T-Shirt",
+          "description": "A very comfortable and stylish t-shirt.",
+          "price": 29.99,
+          "imageUrl": "https://example.com/images/t-shirt.jpg"
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/api/auth/signup": {
+      "post": {
+        "summary": "Đăng ký tài khoản mới",
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "username",
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "user123"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "Password123"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tài khoản đã được tạo thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dữ liệu không hợp lệ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email hoặc username đã tồn tại",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi máy chủ"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Đăng nhập",
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "test008@gmail.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": 123123
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đăng nhập thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dữ liệu không hợp lệ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Email hoặc mật khẩu không đúng",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi máy chủ"
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "summary": "Đăng xuất",
+        "tags": [
+          "Authentication"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Đăng xuất thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Đăng xuất thành công"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Không có quyền truy cập",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi máy chủ"
+          }
+        }
+      }
+    },
+    "/api/auth/refresh-token": {
+      "post": {
+        "summary": "Làm mới access token",
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "refreshToken"
+                ],
+                "properties": {
+                  "refreshToken": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token mới đã được tạo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "accessToken": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Refresh token không hợp lệ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Refresh token đã hết hạn",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi máy chủ"
+          }
+        }
+      }
+    },
+    "/api/auth/current-user": {
+      "get": {
+        "summary": "Lấy thông tin người dùng hiện tại",
+        "tags": [
+          "Authentication"
+        ],
+        "responses": {
+          "200": {
+            "description": "Trả về thông tin người dùng hiện tại",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Không có quyền truy cập",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi máy chủ"
+          }
+        }
+      }
+    },
+    "/api/auth/forgot-password": {
+      "post": {
+        "summary": "Yêu cầu đặt lại mật khẩu",
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã gửi email đặt lại mật khẩu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Email đặt lại mật khẩu đã được gửi"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Email không hợp lệ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Không tìm thấy tài khoản với email này",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi máy chủ"
+          }
+        }
+      }
+    },
+    "/api/auth/reset-password/{token}": {
+      "post": {
+        "summary": "Đặt lại mật khẩu",
+        "tags": [
+          "Authentication"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "token",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Token đặt lại mật khẩu"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "password",
+                  "confirmPassword"
+                ],
+                "properties": {
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "NewPassword123"
+                  },
+                  "confirmPassword": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "NewPassword123"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mật khẩu đã được đặt lại thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Mật khẩu đã được đặt lại thành công"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dữ liệu không hợp lệ hoặc mật khẩu không khớp",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token không hợp lệ hoặc đã hết hạn",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi máy chủ"
+          }
+        }
+      }
+    },
+    "/api/cart": {
+      "get": {
+        "summary": "Lấy giỏ hàng của người dùng hiện tại",
+        "tags": [
+          "Carts"
+        ],
+        "responses": {
+          "200": {
+            "description": "Lấy giỏ hàng thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cart"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Không có quyền truy cập"
+          },
+          "404": {
+            "description": "Không tìm thấy giỏ hàng"
+          },
+          "500": {
+            "description": "Lỗi máy chủ"
+          }
+        }
+      }
+    },
+    "/api/cart/count": {
+      "get": {
+        "summary": "Đếm số lượng sản phẩm trong giỏ hàng của người dùng hiện tại",
+        "tags": [
+          "Carts"
+        ],
+        "responses": {
+          "200": {
+            "description": "Số lượng sản phẩm trong giỏ hàng",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number",
+                      "description": "Số lượng sản phẩm trong giỏ hàng"
+                    }
+                  },
+                  "example": {
+                    "count": 3
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Không có quyền truy cập"
+          },
+          "404": {
+            "description": "Không tìm thấy giỏ hàng"
+          }
+        }
+      }
+    },
+    "/api/cart/add": {
+      "post": {
+        "summary": "Thêm sản phẩm vào giỏ hàng",
+        "tags": [
+          "Carts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "productId": {
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "productId",
+                  "quantity"
+                ],
+                "example": {
+                  "productId": "60d0fe4f5311236168a109ca",
+                  "quantity": 1
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Thêm sản phẩm thành công, trả về giỏ hàng đã cập nhật",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cart"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dữ liệu không hợp lệ (ví dụ: productId thiếu)"
+          },
+          "401": {
+            "description": "Unauthorized - Không có quyền truy cập"
+          },
+          "404": {
+            "description": "Không tìm thấy sản phẩm"
+          },
+          "500": {
+            "description": "Lỗi máy chủ"
+          }
+        }
+      }
+    },
+    "/api/cart/remove/{productId}": {
+      "delete": {
+        "summary": "Xóa một sản phẩm khỏi giỏ hàng",
+        "tags": [
+          "Carts"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "productId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "ID của sản phẩm cần xóa"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Xóa thành công, trả về giỏ hàng đã cập nhật",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cart"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Sản phẩm không có trong giỏ hàng"
+          },
+          "500": {
+            "description": "Lỗi máy chủ"
+          }
+        }
+      }
+    },
+    "/api/cart/clear": {
+      "delete": {
+        "summary": "Xóa tất cả sản phẩm khỏi giỏ hàng",
+        "tags": [
+          "Carts"
+        ],
+        "responses": {
+          "200": {
+            "description": "Giỏ hàng đã được xóa sạch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "message": "Cart cleared successfully"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Lỗi máy chủ"
+          }
+        }
+      }
+    },
+    "/api/categories": {
+      "get": {
+        "summary": "Retrieve a list of all categories",
+        "tags": [
+          "Categories"
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of categories retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Category"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Internal server error"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/categories/search": {
+      "get": {
+        "summary": "Search and filter categories with pagination",
+        "tags": [
+          "Categories"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search by category name",
+            "example": "Electronics"
+          },
+          {
+            "in": "query",
+            "name": "isActive",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter by active status",
+            "example": true
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Page number for pagination",
+            "example": 1
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "description": "Number of items per page",
+            "example": 10
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Categories found successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "currentPage": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "totalPages": {
+                      "type": "integer",
+                      "example": 5
+                    },
+                    "totalItems": {
+                      "type": "integer",
+                      "example": 50
+                    },
+                    "itemsPerPage": {
+                      "type": "integer",
+                      "example": 10
+                    },
+                    "categories": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Category"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/categories/create": {
+      "post": {
+        "summary": "Create a new category",
+        "tags": [
+          "Categories"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "The name of the category",
+                    "example": "Electronics"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The description of the category",
+                    "example": "Electronic devices and accessories"
+                  },
+                  "isActive": {
+                    "type": "boolean",
+                    "description": "Whether the category is active",
+                    "default": true,
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Category created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Category created successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Category"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required fields or category already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Category name is required"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing token"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/categories/{slug}": {
+      "put": {
+        "summary": "Update a category by slug",
+        "tags": [
+          "Categories"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The slug of the category to update",
+            "example": "electronics"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "The new name of the category",
+                    "example": "Smart Electronics"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The new description of the category",
+                    "example": "Smart electronic devices and IoT products"
+                  },
+                  "isActive": {
+                    "type": "boolean",
+                    "description": "Whether the category is active",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Category updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Category updated successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Category"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing token"
+          },
+          "404": {
+            "description": "Category not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Category not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/categories/{id}": {
+      "delete": {
+        "summary": "Delete a category by ID",
+        "tags": [
+          "Categories"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the category to delete",
+            "example": "64f8a1234567890abcdef123"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Category deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing token"
+          },
+          "404": {
+            "description": "Category not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Category not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Internal server error"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products": {
+      "get": {
+        "summary": "Lấy danh sách tất cả sản phẩm",
+        "tags": [
+          "Products"
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sách các sản phẩm",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi máy chủ"
+          }
+        }
+      }
+    },
+    "/api/products/create": {
+      "post": {
+        "summary": "Tạo một sản phẩm mới",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Product"
+              },
+              "example": {
+                "name": "New Gadget",
+                "description": "The latest and greatest gadget.",
+                "price": 99.99,
+                "imageUrl": "https://example.com/images/gadget.jpg"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Sản phẩm đã được tạo thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Không có quyền truy cập"
+          },
+          "500": {
+            "description": "Lỗi máy chủ"
+          }
+        }
+      }
+    },
+    "/api/products/search": {
+      "get": {
+        "summary": "Tìm kiếm sản phẩm theo tên",
+        "tags": [
+          "Products"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Tên sản phẩm cần tìm kiếm"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sách các sản phẩm phù hợp",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Không tìm thấy sản phẩm nào"
+          },
+          "500": {
+            "description": "Lỗi máy chủ"
+          }
+        }
+      }
+    },
+    "/api/products/{id}": {
+      "put": {
+        "summary": "Cập nhật sản phẩm theo ID",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "ID của sản phẩm"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Product"
+              },
+              "example": {
+                "name": "Updated Gadget",
+                "price": 109.99
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cập nhật sản phẩm thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Không có quyền truy cập"
+          },
+          "404": {
+            "description": "Không tìm thấy sản phẩm"
+          },
+          "500": {
+            "description": "Lỗi máy chủ"
+          }
+        }
+      },
+      "get": {
+        "summary": "Lấy thông tin chi tiết sản phẩm theo ID",
+        "tags": [
+          "Products"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "ID của sản phẩm"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thông tin chi tiết sản phẩm",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Không tìm thấy sản phẩm"
+          },
+          "500": {
+            "description": "Lỗi máy chủ"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Xóa sản phẩm theo ID",
+        "tags": [
+          "Products"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "ID của sản phẩm"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Xóa sản phẩm thành công"
+          },
+          "401": {
+            "description": "Unauthorized - Không có quyền truy cập"
+          },
+          "404": {
+            "description": "Không tìm thấy sản phẩm"
+          },
+          "500": {
+            "description": "Lỗi máy chủ"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "Quản lý xác thực và ủy quyền người dùng"
+    },
+    {
+      "name": "Carts",
+      "description": "API quản lý giỏ hàng"
+    },
+    {
+      "name": "Categories",
+      "description": "API for categories management"
+    },
+    {
+      "name": "Products",
+      "description": "The products managing API"
+    }
+  ]
+}
