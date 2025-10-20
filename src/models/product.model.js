@@ -39,6 +39,10 @@ const ProductSchema = new mongoose.Schema(
             default: 0,
             min: [0, 'Product price must be positive number'], // Giá trị nhỏ nhất là 0
         },
+        newPrice: {
+            type: Number,
+            min: [0, 'New price must be positive number'],
+        },
         discount: {
             type: Number,
             default: 0,
@@ -48,7 +52,6 @@ const ProductSchema = new mongoose.Schema(
         stock: {
             type: Number,
             required: true,
-            unique: true,
             min: [0, 'Stock must be positive number'],
             default: 0,
         },

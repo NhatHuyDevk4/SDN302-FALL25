@@ -56,11 +56,6 @@ const router = express.Router();
  *         updatedBy: "64f8a1234567890abcdef456"
  *         createdAt: "2024-10-13T10:30:00.000Z"
  *         updatedAt: "2024-10-13T10:30:00.000Z"
- *   securitySchemes:
- *     bearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
  */
 
 /**
@@ -75,7 +70,7 @@ const router = express.Router();
  * /api/categories:
  *   get:
  *     summary: Retrieve a list of all categories
- *     tags: [Categories]
+ *     tags: [Categories] 
  *     responses:
  *       200:
  *         description: A list of categories retrieved successfully
@@ -87,7 +82,7 @@ const router = express.Router();
  *                 success:
  *                   type: boolean
  *                   example: true
- *                 categories:
+ *                 data:
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Category'
