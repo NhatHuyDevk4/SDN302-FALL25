@@ -6,7 +6,7 @@ export const getAllProducts = async (req, res) => {
     try {
         const products = await Product.find() // Lấy tất cả sản phẩm trong database
         console.log('Products:', products);
-        return res.status(200).json({ products: products });
+        return res.status(200).json({ data: products });
     } catch (error) {
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
@@ -59,7 +59,7 @@ export const getProductById = async (req, res) => {
             return res.status(404).json({ message: 'Product not found' });
         }
 
-        return res.status(200).json({ product: product });
+        return res.status(200).json({ data: product });
     } catch (error) {
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }

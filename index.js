@@ -8,6 +8,7 @@ import authRouter from './src/routes/auth-routes.routes.js'
 import profileRouter from './src/routes/profile.routes.js';
 import productRouter from './src/routes/product.routes.js';
 import categoryRouter from './src/routes/categories.routes.js';
+import cartRouter from './src/routes/cart.routes.js';
 import { setupSwagger } from './src/config/swagger.js';
 const app = express()
 
@@ -32,6 +33,7 @@ app.use('/api/auth', authRouter) // Mục đính phục cho riêng authenticatio
 app.use('/api/profile', profileRouter) // Mục đính phục cho riêng profile
 app.use('/api/products', productRouter) // Mục đính phục cho riêng product
 app.use('/api/categories', categoryRouter) // Mục đính phục cho riêng category
+app.use('/api/cart', cartRouter) // Mục đính phục cho riêng cart
 
 app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000')

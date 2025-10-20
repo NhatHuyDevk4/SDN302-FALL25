@@ -111,7 +111,7 @@ export const refreshTokenController = async (req, res) => {
         return res.status(401).json({ message: 'No refresh token provided' });
     }
     try {
-        const user = await User.findOne({ refreshToken });
+        const user = await User.findOne({ refresToken });
         if (!user) {
             return res.status(403).json({ message: 'Invalid refresh token 1' });
         }
