@@ -16,6 +16,10 @@ const options = {
                 url: "http://localhost:3000",
                 description: "Local server"
             },
+            {
+                url: 'sdn-302-fall-25.vercel.app',
+                description: "Production server"
+            }
         ],
         components: { // Định nghĩa các thành phần tái sử dụng trong tài liệu API
             securitySchemes: { // Cơ chế bảo mật
